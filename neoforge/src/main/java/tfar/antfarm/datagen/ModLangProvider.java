@@ -26,8 +26,11 @@ public class ModLangProvider extends LanguageProvider {
 
     @Override
     protected void addTranslations() {
+        addPreset();
+    }
 
-
+    protected void addPreset() {
+        add("generator.antfarm.classic","Antfarm Classic");
     }
 
     protected void addPotion(Holder<Potion> potion, String name) {

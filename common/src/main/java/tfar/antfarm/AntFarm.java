@@ -1,8 +1,15 @@
 package tfar.antfarm;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerChunkCache;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.chunk.ChunkGenerator;
+import net.minecraft.world.level.storage.ServerLevelData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.function.Consumer;
 
 // This class is part of the common project meaning it is shared between all supported loaders. Code written here can only
 // import and access the vanilla codebase, libraries used by vanilla, and optionally third party libraries that provide
@@ -25,6 +32,18 @@ public class AntFarm {
         // we have an interface in the common code and use a loader specific implementation to delegate our call to
         // the platform specific approach.
 
+    }
+
+    public static void forceDefaultSpawn(ServerLevel level,ServerLevelData data,Runnable cancel) {
+        ServerChunkCache chunkCache = level.getChunkSource();
+        ChunkGenerator chunkGenerator = chunkCache.getGenerator();
+
+        if (chunkGenerator instanceof AntFarmChunkGenerator) {
+            BlockPos spawn = data.getSpawnPos();
+            BlockPos newSpawn = new BlockPos(spawn.getX(), spawn.getY(), spawn.getZ() % 16);
+            data.setSpawn(newSpawn, 0);
+            cancel.run();
+        }
     }
 
     public static ResourceLocation id(String path) {
