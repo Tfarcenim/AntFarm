@@ -7,6 +7,7 @@ import net.minecraft.world.level.chunk.ChunkGenerator;
 public class AntFarmChunkGenerators {
 
     public static MapCodec<? extends ChunkGenerator> bootstrap(Registry<MapCodec<? extends ChunkGenerator>> registry) {
+        Registry.register(registry,AntFarm.id("antfarm_end"),AntFarmEndChunkGenerator.CODEC);
         return Registry.register(registry, AntFarm.id("antfarm"), AntFarmChunkGenerator.CODEC);
     }
 }

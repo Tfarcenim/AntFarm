@@ -14,7 +14,7 @@
     "minecraft:the_end": {
       "type": "minecraft:the_end",
       "generator": {
-        "type": "minecraft:noise",
+        "type": "antfarm:antfarm_end",
         "biome_source": {
           "type": "minecraft:the_end"
         },

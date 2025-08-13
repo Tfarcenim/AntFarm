@@ -19,5 +19,6 @@ public class ModBlockTagsProvider extends BlockTagsProvider {
     @Override
     protected void addTags(HolderLookup.Provider provider) {
         tag(BlockTags.GEODE_INVALID_BLOCKS).add(Blocks.BARRIER);
+        tag(BlockTags.FEATURES_CANNOT_REPLACE).add(Blocks.BARRIER);
     }
 }

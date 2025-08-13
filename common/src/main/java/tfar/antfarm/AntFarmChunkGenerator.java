@@ -5,17 +5,12 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
-import net.minecraft.core.SectionPos;
-import net.minecraft.util.Mth;
-import net.minecraft.world.level.ChunkPos;
-import net.minecraft.world.level.LevelHeightAccessor;
 import net.minecraft.world.level.StructureManager;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeManager;
 import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.levelgen.*;
@@ -49,6 +44,16 @@ public class AntFarmChunkGenerator extends NoiseBasedChunkGenerator {
     public void applyBiomeDecoration(WorldGenLevel level, ChunkAccess chunk, StructureManager structureManager) {
         if (antFarmed(chunk)) {
             super.applyBiomeDecoration(level, chunk, structureManager);
+        } else if (chunk.getPos().z == 1 || chunk.getPos().z == -1 ) {
+            BlockPos.MutableBlockPos mutableBlockPos = new BlockPos.MutableBlockPos();
+            for (int y = chunk.getMinBuildHeight(); y < chunk.getMaxBuildHeight(); y++) {
+                for (int z = 0; z < 16; z++) {
+                    for (int x = 0; x < 16; x++) {
+                        mutableBlockPos.set(x, y, z);
+                        chunk.setBlockState(mutableBlockPos, Blocks.BARRIER.defaultBlockState(), false);
+                    }
+                }
+            }
         }
     }
 
@@ -63,16 +68,31 @@ public class AntFarmChunkGenerator extends NoiseBasedChunkGenerator {
         int z = chunk.getPos().z;
         switch (z) {
             case -1 -> {
-                return placeBarrierBlocks(chunk,-1);
+           //     return fillBarrierBlocks(chunk);
                 }
             case 0 ->{
                 return super.fillFromNoise(blender, randomState, structureManager, chunk);
             }
             case 1 ->{
-                return placeBarrierBlocks(chunk,16);
+           //     return fillBarrierBlocks(chunk);
             }
         }
         return CompletableFuture.completedFuture(chunk);
+    }
+
+    CompletableFuture<ChunkAccess> fillBarrierBlocks(ChunkAccess chunk) {
+        return CompletableFuture.supplyAsync(() -> {
+            BlockPos.MutableBlockPos mutableBlockPos = new BlockPos.MutableBlockPos();
+            for (int y = chunk.getMinBuildHeight(); y < chunk.getMaxBuildHeight(); y++) {
+                for (int z = 0; z < 16; z++) {
+                    for (int x = 0; x < 16; x++) {
+                        mutableBlockPos.set(x, y, z);
+                        chunk.setBlockState(mutableBlockPos, Blocks.BARRIER.defaultBlockState(), false);
+                    }
+                }
+            }
+            return chunk;
+        });
     }
 
     CompletableFuture<ChunkAccess> placeBarrierBlocks(ChunkAccess chunk,int z) {
@@ -87,6 +107,8 @@ public class AntFarmChunkGenerator extends NoiseBasedChunkGenerator {
             return chunk;
         });
     }
+
+
 
     @Override
     protected MapCodec<? extends ChunkGenerator> codec() {
