@@ -4,6 +4,10 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.Mth;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.storage.ServerLevelData;
 import org.slf4j.Logger;
@@ -34,7 +38,7 @@ public class AntFarm {
 
     }
 
-    public static void forceDefaultSpawn(ServerLevel level,ServerLevelData data,Runnable cancel) {
+    public static void forceDefaultSpawn(ServerLevel level, ServerLevelData data, Runnable cancel) {
         ServerChunkCache chunkCache = level.getChunkSource();
         ChunkGenerator chunkGenerator = chunkCache.getGenerator();
 
@@ -46,7 +50,27 @@ public class AntFarm {
         }
     }
 
+    public static void playerTick(ServerPlayer player) {
+        if (!player.getAbilities().instabuild  && player.serverLevel().getGameTime() % 10 == 0) {
+            int r = 240;
+            ServerLevel level = player.serverLevel();
+            if (level.getChunkSource().getGenerator() instanceof AntFarmChunkGenerator) {
+                if (player.getZ() < 0 || player.getZ() > 16) {
+                    player.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 20, 0));
+                    player.hurt(player.damageSources().outOfBorder(), Mth.abs((float) (player.getZ() - 8) - 8));
+                }
+            } else if (level.getChunkSource().getGenerator() instanceof AntFarmEndChunkGenerator) {
+                if (player.getX()<-r || player.getX() > r||player.getZ()<-r||player.getZ() > r) {
+                    float xDist = Math.max(Mth.abs((float) player.getX()) -r,0);
+                    float zDist = Math.max(Mth.abs((float) player.getZ()) -r,0);
+                    player.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 20, 0));
+                    player.hurt(player.damageSources().outOfBorder(), xDist+zDist);
+                }
+            }
+        }
+    }
+
     public static ResourceLocation id(String path) {
-        return ResourceLocation.fromNamespaceAndPath(MOD_ID,path);
+        return ResourceLocation.fromNamespaceAndPath(MOD_ID, path);
     }
 }
