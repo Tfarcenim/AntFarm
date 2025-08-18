@@ -77,10 +77,10 @@ public class AntFarmWorldPresets {
             Holder<NoiseGeneratorSettings> holder1 = this.noiseSettings.getOrThrow(NoiseGeneratorSettings.NETHER);
             Holder.Reference<MultiNoiseBiomeSourceParameterList> reference = this.multiNoiseBiomeSourceParameterLists
                     .getOrThrow(MultiNoiseBiomeSourceParameterLists.NETHER);
-            this.netherStem = new LevelStem(holder, new AntFarmChunkGenerator(MultiNoiseBiomeSource.createFromPreset(reference), holder1));
+            this.netherStem = new LevelStem(holder, new AntFarmStripChunkGenerator(MultiNoiseBiomeSource.createFromPreset(reference), holder1,0,1));
             Holder<DimensionType> holder2 = holdergetter.getOrThrow(BuiltinDimensionTypes.END);
             Holder<NoiseGeneratorSettings> holder3 = this.noiseSettings.getOrThrow(NoiseGeneratorSettings.END);
-            this.endStem = new LevelStem(holder2, new AntFarmEndChunkGenerator(TheEndBiomeSource.create(this.biomes), holder3));
+            this.endStem = new LevelStem(holder2, new AntFarmSquareChunkGenerator(TheEndBiomeSource.create(this.biomes), holder3,16));
         }
 
         private LevelStem makeOverworld(ChunkGenerator generator) {
@@ -92,7 +92,7 @@ public class AntFarmWorldPresets {
         }
 
         private LevelStem makeAntFarmOverworld(BiomeSource biomeSource, Holder<NoiseGeneratorSettings> settings) {
-            return this.makeOverworld(new AntFarmChunkGenerator(biomeSource, settings));
+            return this.makeOverworld(new AntFarmStripChunkGenerator(biomeSource, settings,0,1));
         }
 
 

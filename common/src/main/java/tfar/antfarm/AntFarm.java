@@ -13,8 +13,6 @@ import net.minecraft.world.level.storage.ServerLevelData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.function.Consumer;
-
 // This class is part of the common project meaning it is shared between all supported loaders. Code written here can only
 // import and access the vanilla codebase, libraries used by vanilla, and optionally third party libraries that provide
 // common compatible binaries. This means common code can not directly use loader specific concepts such as Forge events
@@ -41,10 +39,13 @@ public class AntFarm {
     public static void forceDefaultSpawn(ServerLevel level, ServerLevelData data, Runnable cancel) {
         ServerChunkCache chunkCache = level.getChunkSource();
         ChunkGenerator chunkGenerator = chunkCache.getGenerator();
-
-        if (chunkGenerator instanceof AntFarmChunkGenerator) {
+        if (chunkGenerator instanceof AntFarmStripChunkGenerator antFarmStripChunkGenerator) {
             BlockPos spawn = data.getSpawnPos();
-            BlockPos newSpawn = new BlockPos(spawn.getX(), spawn.getY(), spawn.getZ() % 16);
+
+            int minz = antFarmStripChunkGenerator.minZ();
+            int maxz = antFarmStripChunkGenerator.maxZ();
+            int randomZ = 16 * minz +level.random.nextInt((maxz-minz) * 16);
+            BlockPos newSpawn = new BlockPos(spawn.getX(), spawn.getY(), randomZ);
             data.setSpawn(newSpawn, 0);
             cancel.run();
         }
@@ -52,19 +53,12 @@ public class AntFarm {
 
     public static void playerTick(ServerPlayer player) {
         if (!player.getAbilities().instabuild  && player.serverLevel().getGameTime() % 10 == 0) {
-            int r = 240;
             ServerLevel level = player.serverLevel();
-            if (level.getChunkSource().getGenerator() instanceof AntFarmChunkGenerator) {
-                if (player.getZ() < 0 || player.getZ() > 16) {
+            if (level.getChunkSource().getGenerator() instanceof AntFarmChunkGenerator antFarmChunkGenerator) {
+                float damage = antFarmChunkGenerator.getOutOfBoundsDamage(player.position());
+                if (damage > 0) {
                     player.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 20, 0));
-                    player.hurt(player.damageSources().outOfBorder(), Mth.abs((float) (player.getZ() - 8) - 8));
-                }
-            } else if (level.getChunkSource().getGenerator() instanceof AntFarmEndChunkGenerator) {
-                if (player.getX()<-r || player.getX() > r||player.getZ()<-r||player.getZ() > r) {
-                    float xDist = Math.max(Mth.abs((float) player.getX()) -r,0);
-                    float zDist = Math.max(Mth.abs((float) player.getZ()) -r,0);
-                    player.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 20, 0));
-                    player.hurt(player.damageSources().outOfBorder(), xDist+zDist);
+                    player.hurt(player.damageSources().outOfBorder(), damage);
                 }
             }
         }

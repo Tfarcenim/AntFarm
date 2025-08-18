@@ -3,32 +3,37 @@
     "minecraft:overworld": {
       "type": "minecraft:overworld",
       "generator": {
-        "type": "antfarm:antfarm",
+        "type": "antfarm:antfarm_strip",
         "biome_source": {
           "type": "minecraft:multi_noise",
           "preset": "minecraft:overworld"
         },
+        "max_z": 1,
+        "min_z": 0,
         "settings": "minecraft:overworld"
       }
     },
     "minecraft:the_end": {
       "type": "minecraft:the_end",
       "generator": {
-        "type": "antfarm:antfarm_end",
+        "type": "antfarm:antfarm_square",
         "biome_source": {
           "type": "minecraft:the_end"
         },
-        "settings": "minecraft:end"
+        "settings": "minecraft:end",
+        "size": 16
       }
     },
     "minecraft:the_nether": {
       "type": "minecraft:the_nether",
       "generator": {
-        "type": "antfarm:antfarm",
+        "type": "antfarm:antfarm_strip",
         "biome_source": {
           "type": "minecraft:multi_noise",
           "preset": "minecraft:nether"
         },
+        "max_z": 1,
+        "min_z": 0,
         "settings": "minecraft:nether"
       }
     }

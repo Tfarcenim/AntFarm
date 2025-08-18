@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import tfar.antfarm.AntFarmEndChunkGenerator;
+import tfar.antfarm.AntFarmSquareChunkGenerator;
 
 @Mixin(EndDragonFight.class)
 public class EndDragonFightMixin {
@@ -18,7 +18,7 @@ public class EndDragonFightMixin {
 
     @Inject(method = "spawnNewGateway(Lnet/minecraft/core/BlockPos;)V",at = @At("HEAD"),cancellable = true)
     private void blockGateWay(BlockPos pos, CallbackInfo ci) {
-        if (level.getChunkSource().getGenerator() instanceof AntFarmEndChunkGenerator) {
+        if (level.getChunkSource().getGenerator() instanceof AntFarmSquareChunkGenerator) {
             ci.cancel();
         }
     }
